@@ -64,8 +64,8 @@ module TelegramAlerts
       name
     end
 
-    def self.exception(e, severity, message: nil)
-      message = parse_exception(e, severity, message: message)
+    def self.exception(e, severity, message = nil)
+      message = parse_exception(e, severity, message)
       send_message(message, bot_token, chat_id)
     end
 
@@ -88,8 +88,6 @@ module TelegramAlerts
 
     def self.parse_exception(exception, severity, message = nil)
       severity_emoji = TelegramAlerts.severity_parser[severity]
-      project_path = File.expand_path('../..', __FILE__)
-
       lines = exception.backtrace.map{ |x|
         x.match(/^(.+?):(\d+)(|:in `(.+)')$/);
         [$1,$2,$4]
@@ -114,7 +112,6 @@ module TelegramAlerts
         "\n<b>Environment</b>",
         " Env: #{host_name} server with ruby #{RUBY_VERSION}",
         " Project: #{project_name}",
-        " Path: #{project_path}",
         "\n<i>#{now.strftime('%H:%M:%S %d-%m-%Y')}</i>",
         "\n<i>#{now.strftime('%z')} #{ENV['TZ']}</i>"
       ]
