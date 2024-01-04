@@ -95,20 +95,21 @@ module TelegramAlerts
 
       now = Time.now
 
+      backtrace_message = lines.map do |file, line, method|
+        output = "#{file}:#{line} in `#{method}'"
+        # substitue caracteres HTML da mensagem de exceção por valores vazios
+        output = output.gsub(/<|>|&|"/, '')
+        output
+      end
+      backtrace_message = backtrace_message.join("\n")[0..3596]
+
       formatted_message = [
         "#{severity_emoji} <b>#{exception.class}</b>",
         "\n<b>Message</b>",
         "<i>#{exception.message}</i>",
         # Custom message goes here if any
         "\n<b>Backtrace</b>",
-        lines.map do
-        |file, line, method|
-          output = "#{file}:#{line} in `#{method}'"
-          TelegramAlerts.special_telegram_chars.each do |k, v|
-            output = output.gsub(k, v)
-          end
-          output
-        end,
+        backtrace_message,
         "\n<b>Environment</b>",
         " Env: #{host_name} server with ruby #{RUBY_VERSION}",
         " Project: #{project_name}",
